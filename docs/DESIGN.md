@@ -1,6 +1,6 @@
 # 등기체크 — 클래스 설계
 
-언어: JavaScript · 뼈대는 `core/` (몸통은 TODO)
+언어: JavaScript(빌드 없는 ES 모듈) · `core/` 에 다 있다. 아래 그림은 VYNE 가 처음 잡은 설계이고, 만들면서 바꾼 것은 맨 아래 '바꾼 것'에 적었다.
 
 ```mermaid
 classDiagram
@@ -85,3 +85,15 @@ classDiagram
 - 등기 글은 브라우저 안에서만 처리하고 서버 전송·저장을 하지 않는다. 사용자 입력 저장소는 두지 않았다.
 - 위험·주의 기준 수치(비율 등)는 규칙 JSON의 값으로 두며, 이 설계에서 임의로 정하지 않았다. 팀 체크리스트 정리 때 확정한다.
 - 미룬 것: 파서의 다양한 등기 양식 대응(데모는 가상 시나리오 2개 형식만), 결과 저장·공유, 다국어.
+
+
+## 바꾼 것 — 만들면서
+
+- `RegistryParser.parse()` 가 돌려주는 `RegistryInfo` 를 `{owner, ownerIsTrustee, rights[], warnings[], cancelled[], folded[]}` 로 정했다. 부기등기(1-1 변경·1-2 이전)를 본 등기에 합치고 말소된 걸 빼는 일이 파서 안에 있어야 엔진이 '살아 있는 권리'만 보게 돼서다. `extractMortgages()` 는 순위번호·접수일도 같이 준다(결과 화면에 '을구 1번'을 보여 주려고).
+- 규칙 JSON 에 `items`(화면에 보이는 점검 항목 11개와 통과 문구)를 더했다. 규칙만 있으면 '걸리지 않은 항목'을 초록으로 보여 줄 문장이 없어서다. 규칙 하나는 `item` 하나에 속하고, 한 항목의 신호등은 그 항목 규칙 가운데 가장 나쁜 등급이다(비율 80%↑ 빨강, 70~80% 노랑).
+- `conditionHandlers` 는 `has · ratioAtLeast · ratioBelow · ownerMismatch · trustee · always`. 판정 함수는 참·거짓 말고 `null`(입력이 없어 모름)도 낸다 — 시세를 비워 두면 비율 항목이 '모름'(회색)이 되도록.
+- `RuleRepository` 에 `fetchItems()`·`listScenarios()` 를 더하고, 생성자에 JSON 읽는 함수를 넣을 수 있게 했다(브라우저는 fetch, 시험은 파일 읽기). `loadScenario()` 는 `CheckInput` 이 아니라 시나리오(글·보증금·시세·계약 상대)를 준다 — 데모는 '붙여 넣기'부터 보여 줘야 해서.
+- `ExplanationBuilder` 는 생성자에서 규칙·항목을 받아 `templates` 를 만든다(`'ratio-red'` → 이유, `'pass:ratio'` → 통과 문구).
+- `CheckFormView` 는 생성자에서 `RegistryParser` 를 받는다(설계의 '씀' 관계). `setValues()`(데모·샘플 채우기)와 `onSample`·`onChange` 콜백을 더했다. 붙여 넣으면 버튼 없이 바로 뽑고, 사람이 고친 뒤 글이 바뀌면 덮어쓰지 않고 '다시 뽑기'를 묻는다.
+- `ResultView` 에 `markStale()` 를 더했다 — 결과가 뜬 뒤 칸을 고치면 '옛 결과'라고 흐리게 표시한다.
+- 화면 결은 애플 리퀴드 글라스(반투명 유리판·캡슐 단추·iOS 시스템 색). 투명도 줄이기·어두운 화면을 따로 챙긴다.
