@@ -41,6 +41,7 @@ export class App {
     this.formView = new FormView(this.els.form, new RegistryParser(), glossary);
     this.formView.onSubmit = input => this.handleSubmit(input);
     this.formView.onSample = id => this.runDemo(id, { submit: false });
+    this.formView.onChange = () => this.resultView.markStale();
     this.formView.render(samples);
     this.resultView = new Results(this.els.result, glossary);
   }

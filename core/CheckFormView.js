@@ -26,6 +26,8 @@ export class CheckFormView {
     this.onSubmit = () => {};
     /** @type {Function} 샘플을 고르면 부르는 콜백 — (id) => void */
     this.onSample = () => {};
+    /** @type {Function} 칸이 바뀌면 부르는 콜백 — 이미 뜬 결과를 '다시 확인' 상태로 */
+    this.onChange = () => {};
     this.parser = parser;
     this.info = null;
     this.edited = false;
@@ -92,6 +94,8 @@ export class CheckFormView {
     $("#owner").addEventListener("input", () => this.markEdited());
     for (const id of ["deposit", "price"]) $(`#${id}`).addEventListener("input", () => this.showRead(id));
     if ($("#sample")) $("#sample").onchange = e => { if (e.target.value) this.onSample(e.target.value); };
+    this.rootEl.querySelector("form").addEventListener("input", () => this.onChange());
+    this.rootEl.querySelector("form").addEventListener("click", e => { if (e.target.closest(".del, #addRight, #reparse")) this.onChange(); });
     this.rootEl.querySelector("form").onsubmit = e => { e.preventDefault(); const v = this.readInput(); if (v) this.onSubmit(v); };
     reg.addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); this.rootEl.querySelector("form").requestSubmit(); } });
     bindTerms(this.rootEl, this.glossary);

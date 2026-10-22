@@ -89,6 +89,18 @@ export class ResultView {
     return li;
   }
 
+  /** 입력이 바뀌어 지금 결과가 옛것이 됐다고 표시한다(지우지는 않는다 — 비교해 볼 수 있게). */
+  markStale() {
+    const box = this.rootEl.querySelector(".result");
+    if (!box || box.classList.contains("old")) return;
+    box.classList.add("old");
+    const p = document.createElement("p");
+    p.className = "oldnote";
+    p.setAttribute("role", "status");
+    p.textContent = "입력이 바뀌었어요 — 아래 결과는 바뀌기 전 것이에요. '확인'을 다시 누르세요.";
+    box.prepend(p);
+  }
+
   /** 이전 결과를 지운다.
    * @returns {void}
    */

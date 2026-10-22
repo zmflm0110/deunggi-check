@@ -209,6 +209,8 @@ label .term, .gloss .term {
 .g-unknown { --c: var(--gray); --ink: var(--label2); }
 .g-info { --c: var(--gray); --ink: var(--label2); }
 .result .verdict h2 { color: var(--ink); }
+.result.old > :not(.oldnote) { opacity: .45; filter: saturate(.4); }
+.oldnote { margin: 0 0 14px; padding: 10px 14px; border-radius: var(--r-in); background: color-mix(in srgb, var(--orange) 16%, transparent); font-size: 15px; font-weight: 600; }
 
 .headline {
   margin: 18px 0 4px; padding: 16px 18px; border-radius: var(--r-row);

@@ -24,7 +24,7 @@ const base = `http://127.0.0.1:${server.address().port}`;
 
 const profile = mkdtempSync(join(tmpdir(), "deunggi-chrome-"));
 const chrome = spawn(CHROME, ["--headless=new", "--remote-debugging-port=0", `--user-data-dir=${profile}`, "--no-first-run",
-  "--no-default-browser-check", "--disable-extensions", "--hide-scrollbars", "about:blank"], { stdio: "ignore" });
+  "--no-default-browser-check", "--disable-extensions", "--hide-scrollbars", ...(process.env.CI ? ["--no-sandbox"] : []), "about:blank"], { stdio: "ignore" });
 
 const fails = [], errors = [];
 const ok = (cond, what) => { console.log(`${cond ? "  통과" : "  실패"}  ${what}`); if (!cond) fails.push(what); };
@@ -37,13 +37,14 @@ const center = sel => js(`(()=>{const e=document.querySelector(${JSON.stringify(
 const click = async sel => { const p = await center(sel); await sleep(80); for (const type of ["mousePressed", "mouseReleased"]) await cdp("Input.dispatchMouseEvent", { type, x: p.x, y: p.y, button: "left", clickCount: 1 }); };
 const typeInto = async (sel, text) => { await click(sel); await cdp("Input.insertText", { text }); };
 let view = { width: 1180, height: 900, mobile: false };
-const viewport = (width, height, mobile = false) => { view = { width, height, mobile }; return cdp("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 2, mobile }); };
+// 넓은 화면은 1배, 휴대폰은 2배로 찍는다 — 저장소가 그림으로 무거워지지 않게
+const viewport = (width, height, mobile = false) => { view = { width, height, mobile }; return cdp("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: mobile ? 2 : 1, mobile }); };
 // 긴 화면 한 장 — 창을 페이지 높이만큼 늘려 찍는다(위 막대·뒤 배경이 화면에 붙어 있어서 그냥 찍으면 중간에 끊긴다)
 const shot = async name => {
   const { width, height, mobile } = view;
   await js("scrollTo(0,0)");
   const h = await js("Math.ceil(document.documentElement.scrollHeight)");
-  await cdp("Emulation.setDeviceMetricsOverride", { width, height: Math.max(h, height), deviceScaleFactor: 2, mobile });
+  await cdp("Emulation.setDeviceMetricsOverride", { width, height: Math.max(h, height), deviceScaleFactor: mobile ? 2 : 1, mobile });
   await sleep(250);
   const r = await cdp("Page.captureScreenshot", { format: "png" });
   await viewport(width, height, mobile);
@@ -97,6 +98,15 @@ try {
   ok(await js("document.activeElement && document.activeElement.id") === "verdict", "결과로 초점이 옮겨 간다(화면 읽기 프로그램)");
   await js("scrollTo(0,0)");
   await shot("demo.png");
+
+  console.log("결과 뒤에 칸을 고치면");
+  await typeInto("#deposit", "0");
+  ok(await until("!!document.querySelector('.result.old .oldnote')"), "옛 결과라고 표시하고 '확인'을 다시 누르라고 한다");
+  await click("button.go");
+  ok(await until("!document.querySelector('.result.old')"), "다시 누르면 새 결과");
+  await js("document.querySelector('#deposit').value='1억'; document.querySelector('#deposit').dispatchEvent(new Event('input',{bubbles:true}))");
+  await click("button.go");
+  await until("!document.querySelector('.result.old')");
 
   console.log("용어 풀이");
   await click(".result .row .term");
