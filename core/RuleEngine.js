@@ -1,7 +1,7 @@
 /** 체크리스트 규칙을 순서대로 평가해 항목별 위험·주의·양호를 낸다.
  *
  * 규칙은 data/rules.json 에 있다. 규칙 하나 = 점검 항목(item) + 조건(when) + 등급(grade).
- * 조건은 conditionHandlers 의 이름(has·ratioAtLeast·ratioBelow·ownerMismatch·always)이고, 여러 개면 모두 맞아야 걸린다.
+ * 조건은 conditionHandlers 의 이름(has·ratioAtLeast·ratioBelow·ownerMismatch·trustee·always)이고, 여러 개면 모두 맞아야 걸린다.
  * 판정 함수는 true(걸림)·false(안 걸림)·null(입력이 없어 모름) 중 하나를 낸다.
  * 한 항목에 규칙이 여럿이면(비율 80%↑ 빨강, 70~80% 노랑) 가장 나쁜 등급이 그 항목의 신호등이 된다. */
 /** @typedef {import("./RuleRepository.js").RuleRepository} RuleRepository */
@@ -40,6 +40,7 @@ export class RuleEngine {
       ratioAtLeast: (v, input, ctx) => (Number.isFinite(ctx.ratio) ? ctx.ratio >= v : null),
       ratioBelow: (v, input, ctx) => (Number.isFinite(ctx.ratio) ? ctx.ratio < v : null),
       ownerMismatch: (v, input) => { const same = sameName(input.owner, input.counterparty); return same === null ? null : !same === v; },
+      trustee: (v, input) => !!input.ownerIsTrustee === v,
       always: v => !!v,
     };
   }

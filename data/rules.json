@@ -151,10 +151,25 @@
    "item": "jeonse"
   },
   {
+   "id": "owner-trustee",
+   "title": "신탁된 집의 계약 상대",
+   "item": "owner",
+   "when": {
+    "ownerMismatch": true,
+    "trustee": true
+   },
+   "grade": "red",
+   "reason": "등기부의 소유자는 신탁회사({owner})예요. 계약하려는 {counterparty} 님은 집을 맡긴 사람(위탁자)일 수 있는데, 위탁자는 신탁회사 동의 없이 집을 빌려줄 권한이 없을 수 있어요.",
+   "actions": [
+    "계약서에 신탁회사(수탁자)의 동의가 들어가는지, 보증금을 누구 계좌로 보내야 하는지 물어보세요."
+   ]
+  },
+  {
    "id": "owner-mismatch",
    "title": "소유자와 계약 상대",
    "when": {
-    "ownerMismatch": true
+    "ownerMismatch": true,
+    "trustee": false
    },
    "grade": "red",
    "reason": "등기부의 소유자({owner})와 계약하려는 사람({counterparty})이 달라 보여요.",

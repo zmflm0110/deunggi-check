@@ -19,7 +19,7 @@ const builder = new ExplanationBuilder(rules, items);
 
 const check = (text, extra = {}) => {
   const info = parser.parse(text);
-  return builder.buildReport(engine.evaluate({ rights: info.rights, owner: info.owner, ...extra }));
+  return builder.buildReport(engine.evaluate({ rights: info.rights, owner: info.owner, ownerIsTrustee: info.ownerIsTrustee, ...extra }));
 };
 const row = (report, item) => report.rows.find(r => r.item === item);
 
@@ -65,6 +65,7 @@ test("신탁·가압류 오피스텔 — 소유자는 신탁회사, 가압류 �
   const r = check(s.text, { counterparty: s.counterparty, deposit: s.deposit, price: s.price });
   assert.deepEqual(r.rows.filter(x => x.grade === "red").map(x => x.item).sort(), ["owner", "seizure", "trust"]);
   assert.match(row(r, "seizure").reason, /가압류 3,500만 원/);
+  assert.match(row(r, "owner").reason, /위탁자/, "신탁된 집이면 '소유자 다름'을 위탁자 이야기로 풀어 준다");
 });
 
 test("깨끗한 원룸은 양호 — 빨강·노랑이 하나도 없다", async () => {

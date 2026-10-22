@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>등기체크</title>
+<meta name="description" content="등기부등본 글을 붙여 넣으면 근저당·가압류·소유자를 뽑아 체크리스트로 점검하고, 계약 전에 물어볼 것을 알려 줘요.">
+<meta name="theme-color" content="#F2F2F7">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wall" aria-hidden="true"></div>
+<header class="bar">
+  <div class="bar-in"><span class="brand"><i aria-hidden="true"></i>등기체크</span><span class="pill">글은 기기 밖으로 안 나가요</span></div>
+</header>
+<section class="hero wrap">
+  <h1>계약 전에, 등기부등본을 <br class="m">체크리스트로 한 번.</h1>
+  <p class="lead">붙여 넣은 글에서 근저당·가압류·소유자를 뽑고, 내 보증금이 안전한지 신호등으로 알려 줘요.</p>
+</section>
+<main class="wrap">
+  <div id="form"></div>
+  <div id="result" aria-live="polite" hidden></div>
+  <noscript><p class="err">자바스크립트를 켜야 쓸 수 있어요.</p></noscript>
+</main>
+<footer class="wrap foot">
+  <p>모든 계산은 브라우저 안에서만 해요. 서버·AI·저장 없음 · 규칙은 <a href="../data/rules.json">rules.json</a> 한 파일 · <a href="https://github.com/zmflm0110/deunggi-check">소스</a></p>
+</footer>
+<script type="module">
+import { App } from "../core/App.js";
+const app = new App({ form: document.getElementById("form"), result: document.getElementById("result") });
+window.app = app;
+app.init().then(() => {
+  const demo = new URLSearchParams(location.search).get("demo");
+  if (demo) return app.runDemo(demo);
+}).then(() => { document.documentElement.dataset.ready = "1"; })
+  .catch(e => {
+    document.getElementById("form").innerHTML = `<p class="err" role="alert">불러오지 못했어요 — ${String(e.message || e).replace(/</g, "&lt;")}. 파일을 직접 연 경우엔 'npm start' 로 띄워 주세요.</p>`;
+    document.documentElement.dataset.ready = "error";
+  });
+</script>
+</body>
+</html>
