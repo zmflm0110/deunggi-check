@@ -41,7 +41,7 @@ npm start                 # = python3 -m http.server 8080
 
 `http://localhost:8080/app/?demo=villa` 로 열면 4단계까지 한 번에 채워 보여 준다.
 
-이 장면은 `npm run demo:check` 가 진짜 크롬으로 붙여 넣기 → 입력 → '확인'까지 눌러 보고 확인한다(화면은 `demo/*.png`).
+이 장면은 `npm run demo:check` 가 진짜 크롬으로 붙여 넣기 → 입력 → '확인'까지 눌러 보고 확인한다. 화면 그림(`demo/*.png`)을 새로 찍으려면 `npm run demo:shots`.
 
 ## 시험
 

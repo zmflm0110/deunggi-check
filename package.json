@@ -6,7 +6,8 @@
   "scripts": {
     "start": "python3 -m http.server 8080",
     "test": "node --test tests/core.test.js",
-    "demo:check": "node demo/check.mjs"
+    "demo:check": "node demo/check.mjs",
+    "demo:shots": "node demo/check.mjs --shots"
   },
   "license": "MIT"
 }

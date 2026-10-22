@@ -1,4 +1,4 @@
-// 데모 장면을 진짜 브라우저로 돌려 본다 — npm run demo:check
+// 데모 장면을 진짜 브라우저로 돌려 본다 — npm run demo:check (화면 그림까지: npm run demo:shots)
 // 1) 빌라 샘플 글을 붙여 넣고 2) 뽑힌 근저당 9천만·소유자 한○○를 보고 3) 보증금 1억·시세 1억 5천만을 쳐서 4) '확인'을 누르면
 // '선순위 9천만 + 보증금 1억 = 시세의 127% — 빨강'과 이유, 중개사에게 물어볼 질문이 떠야 한다. 화면은 demo/*.png 로 남긴다.
 import { createServer } from "node:http";
@@ -52,7 +52,9 @@ let view = { width: 1180, height: 900, mobile: false };
 // 넓은 화면은 1배, 휴대폰은 2배로 찍는다 — 저장소가 그림으로 무거워지지 않게
 const viewport = (width, height, mobile = false) => { view = { width, height, mobile }; return cdp("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: mobile ? 2 : 1, mobile }); };
 // 긴 화면 한 장 — 창을 페이지 높이만큼 늘려 찍는다(위 막대·뒤 배경이 화면에 붙어 있어서 그냥 찍으면 중간에 끊긴다)
+const SHOTS = process.argv.includes("--shots");   // 화면 그림은 npm run demo:shots 때만 새로 찍는다(돌릴 때마다 저장소가 무거워지지 않게)
 const shot = async name => {
+  if (!SHOTS) return;
   const { width, height, mobile } = view;
   await js("scrollTo(0,0)");
   const h = await js("Math.ceil(document.documentElement.scrollHeight)");
