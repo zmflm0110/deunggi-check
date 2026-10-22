@@ -33,7 +33,19 @@ const waiting = new Map();
 const cdp = (method, params = {}) => new Promise((r, j) => { const id = ++seq; waiting.set(id, m => (m.error ? j(new Error(m.error.message)) : r(m.result))); ws.send(JSON.stringify({ id, method, params })); });
 const js = async expr => { const r = await cdp("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text); return r.result.value; };
 const until = async (expr, ms = 8000) => { const t = Date.now(); while (Date.now() - t < ms) { if (await js(expr).catch(() => false)) return true; await sleep(100); } return false; };
-const center = sel => js(`(()=>{const e=document.querySelector(${JSON.stringify(sel)});e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}})()`);
+// 누를 곳을 화면 가운데로 — 결과로 부드럽게 굴러가는 중이면 멈출 때까지 기다린 뒤 좌표를 잡는다(느린 CI 에서 빗나가지 않게)
+const center = async sel => {
+  const at = () => js(`(()=>{const e=document.querySelector(${JSON.stringify(sel)});const r=e.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}})()`);
+  let last = null;
+  for (let i = 0; i < 30; i++) {
+    await js(`document.querySelector(${JSON.stringify(sel)}).scrollIntoView({block:'center', behavior:'instant'})`);
+    await sleep(60);
+    const p = await at();
+    if (last && Math.abs(p.x - last.x) < 1 && Math.abs(p.y - last.y) < 1) return p;
+    last = p;
+  }
+  return last;
+};
 const click = async sel => { const p = await center(sel); await sleep(80); for (const type of ["mousePressed", "mouseReleased"]) await cdp("Input.dispatchMouseEvent", { type, x: p.x, y: p.y, button: "left", clickCount: 1 }); };
 const typeInto = async (sel, text) => { await click(sel); await cdp("Input.insertText", { text }); };
 let view = { width: 1180, height: 900, mobile: false };
