@@ -1,0 +1,12 @@
+{
+  "name": "deunggi-check",
+  "private": true,
+  "type": "module",
+  "description": "등기부등본의 근저당·가압류를 체크리스트 규칙으로 점검해 계약 직전 위험 신호를 쉬운 말로 알려 주는 웹 도구",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node --test tests/core.test.js",
+    "demo:check": "node demo/check.mjs"
+  },
+  "license": "MIT"
+}

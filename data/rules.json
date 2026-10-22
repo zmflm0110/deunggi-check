@@ -1,42 +1,239 @@
 {
-  "version": 1,
-  "note": "위험 기준 숫자는 법이 정한 값이 아니라 흔히 쓰는 어림 기준이다. 근거와 바꾸는 법은 NOTES.md.",
-  "rules": [
-    { "id": "auction", "title": "경매 시작", "when": { "has": ["auction"] }, "grade": "red",
-      "reason": "이 집은 이미 경매 절차가 시작됐어요. 지금 계약하면 보증금을 지키기 매우 어려워요.",
-      "actions": ["경매가 시작된 집을 계약하라고 권하는 이유를 중개사에게 물어보고, 계약하지 않는 쪽을 먼저 생각하세요."] },
-    { "id": "seizure", "title": "압류·가압류", "when": { "has": ["seizure", "provisional"] }, "grade": "red",
-      "reason": "집주인에게 받을 돈이 있는 사람(또는 기관)이 이 집을 묶어 두었어요({items}). 경매로 이어질 수 있어요.",
-      "actions": ["가압류·압류가 언제, 어떻게 풀리는지 묻고, 잔금 전에 말소된 등기부등본을 보여 달라고 하세요."] },
-    { "id": "injunction", "title": "가처분", "when": { "has": ["injunction"] }, "grade": "red",
-      "reason": "이 집의 소유권을 두고 다툼이 있어 처분을 막아 두었어요. 계약한 뒤에 집주인이 바뀔 수 있어요.",
-      "actions": ["가처분이 어떤 다툼 때문인지, 끝나기 전에 계약해도 되는 이유가 있는지 물어보세요."] },
-    { "id": "trust", "title": "신탁", "when": { "has": ["trust"] }, "grade": "red",
-      "reason": "집 소유권이 신탁회사({holder})로 넘어가 있어요. 신탁회사 동의 없이 집주인과만 계약하면 보호받기 어려워요.",
-      "actions": ["신탁원부를 보여 달라고 하고, 신탁회사(수탁자)의 임대 동의서를 받을 수 있는지 물어보세요."] },
-    { "id": "prereg", "title": "가등기", "when": { "has": ["preregister"] }, "grade": "red",
-      "reason": "나중에 소유권을 넘겨받기로 순서를 잡아 둔 가등기가 있어요. 본등기가 되면 집주인이 바뀌고 내 계약이 밀릴 수 있어요.",
-      "actions": ["가등기가 누구 앞으로, 왜 되어 있는지, 말소될 수 있는지 물어보세요."] },
-    { "id": "lease", "title": "임차권등기", "when": { "has": ["lease"] }, "grade": "red",
-      "reason": "이전 세입자가 보증금을 돌려받지 못한 채 나가며 남긴 임차권등기가 있어요. 보증금을 제때 안 돌려준 적이 있다는 신호예요.",
-      "actions": ["이전 세입자의 보증금을 다 돌려주고 임차권등기를 말소했는지 확인하세요."] },
-    { "id": "ratio-red", "title": "보증금 위험 비율", "when": { "ratioAtLeast": 0.8 }, "grade": "red",
-      "reason": "먼저 잡힌 빚(선순위 {debt})과 내 보증금({deposit})을 합치면 시세({price})의 {pct}%예요. 집이 경매로 넘어가면 내 보증금이 다 남지 않을 수 있어요.",
-      "actions": ["보증금을 낮추거나, 전세보증금 반환보증에 가입할 수 있는 집인지 물어보세요."] },
-    { "id": "ratio-yellow", "title": "보증금 비율 조심", "when": { "ratioAtLeast": 0.7, "ratioBelow": 0.8 }, "grade": "yellow",
-      "reason": "선순위 {debt} + 보증금 {deposit} = 시세({price})의 {pct}%예요. 위험선에 가까워요.",
-      "actions": ["시세를 같은 건물 최근 거래로 다시 확인하고, 반환보증 가입이 되는지 물어보세요."] },
-    { "id": "mortgage", "title": "근저당", "when": { "has": ["mortgage"] }, "grade": "yellow",
-      "reason": "집주인이 이 집을 담보로 돈을 빌렸어요(채권최고액 합계 {mortgageSum}). 경매가 되면 이 돈이 내 보증금보다 먼저예요.",
-      "actions": ["근저당의 실제 대출 잔액이 얼마인지 묻고, 잔금 날 갚고 말소한다는 조건을 계약서 특약에 넣을 수 있는지 물어보세요."] },
-    { "id": "jeonse", "title": "앞선 전세권", "when": { "has": ["jeonse"] }, "grade": "yellow",
-      "reason": "먼저 등기된 전세권(전세금 {jeonseSum})이 있어요. 그 전세금이 내 보증금보다 먼저예요.",
-      "actions": ["그 전세권이 아직 살아 있는지, 그 세입자가 언제 나가고 말소되는지 물어보세요."] },
-    { "id": "owner-mismatch", "title": "소유자와 계약 상대", "when": { "ownerMismatch": true }, "grade": "red",
-      "reason": "등기부의 소유자({owner})와 계약하려는 사람({counterparty})이 달라 보여요.",
-      "actions": ["계약하는 사람이 소유자 본인인지 신분증으로 확인하고, 대리인이면 위임장과 인감증명서를 받으세요."] },
-    { "id": "always", "title": "잔금 날 할 일", "when": { "always": true }, "grade": "info",
-      "reason": "등기부등본은 계약 뒤에도 바뀔 수 있어요.",
-      "actions": ["잔금 날 등기부등본을 다시 떼어 보고, 그날 바로 전입신고와 확정일자를 받으세요."] }
-  ]
+ "version": 1,
+ "note": "위험 기준 숫자(70%·80%)는 법이 정한 값이 아니라 흔히 쓰는 어림 기준이다. 근거와 바꾸는 법은 NOTES.md. items 는 화면에 보이는 점검 항목 순서, rules 는 그 항목을 빨강·노랑으로 만드는 조건이다.",
+ "rules": [
+  {
+   "id": "auction",
+   "title": "경매 시작",
+   "when": {
+    "has": [
+     "auction"
+    ]
+   },
+   "grade": "red",
+   "reason": "이 집은 이미 경매 절차가 시작됐어요. 지금 계약하면 보증금을 지키기 매우 어려워요.",
+   "actions": [
+    "경매가 시작된 집을 계약하라고 권하는 이유를 중개사에게 물어보고, 계약하지 않는 쪽을 먼저 생각하세요."
+   ],
+   "item": "auction"
+  },
+  {
+   "id": "seizure",
+   "title": "압류·가압류",
+   "when": {
+    "has": [
+     "seizure",
+     "provisional"
+    ]
+   },
+   "grade": "red",
+   "reason": "집주인에게 받을 돈이 있는 사람(또는 기관)이 이 집을 묶어 두었어요({items}). 경매로 이어질 수 있어요.",
+   "actions": [
+    "가압류·압류가 언제, 어떻게 풀리는지 묻고, 잔금 전에 말소된 등기부등본을 보여 달라고 하세요."
+   ],
+   "item": "seizure"
+  },
+  {
+   "id": "injunction",
+   "title": "가처분",
+   "when": {
+    "has": [
+     "injunction"
+    ]
+   },
+   "grade": "red",
+   "reason": "이 집의 소유권을 두고 다툼이 있어 처분을 막아 두었어요. 계약한 뒤에 집주인이 바뀔 수 있어요.",
+   "actions": [
+    "가처분이 어떤 다툼 때문인지, 끝나기 전에 계약해도 되는 이유가 있는지 물어보세요."
+   ],
+   "item": "injunction"
+  },
+  {
+   "id": "trust",
+   "title": "신탁",
+   "when": {
+    "has": [
+     "trust"
+    ]
+   },
+   "grade": "red",
+   "reason": "집 소유권이 신탁회사({holder})로 넘어가 있어요. 신탁회사 동의 없이 집주인과만 계약하면 보호받기 어려워요.",
+   "actions": [
+    "신탁원부를 보여 달라고 하고, 신탁회사(수탁자)의 임대 동의서를 받을 수 있는지 물어보세요."
+   ],
+   "item": "trust"
+  },
+  {
+   "id": "prereg",
+   "title": "가등기",
+   "when": {
+    "has": [
+     "preregister"
+    ]
+   },
+   "grade": "red",
+   "reason": "나중에 소유권을 넘겨받기로 순서를 잡아 둔 가등기가 있어요. 본등기가 되면 집주인이 바뀌고 내 계약이 밀릴 수 있어요.",
+   "actions": [
+    "가등기가 누구 앞으로, 왜 되어 있는지, 말소될 수 있는지 물어보세요."
+   ],
+   "item": "prereg"
+  },
+  {
+   "id": "lease",
+   "title": "임차권등기",
+   "when": {
+    "has": [
+     "lease"
+    ]
+   },
+   "grade": "red",
+   "reason": "이전 세입자가 보증금을 돌려받지 못한 채 나가며 남긴 임차권등기가 있어요. 보증금을 제때 안 돌려준 적이 있다는 신호예요.",
+   "actions": [
+    "이전 세입자의 보증금을 다 돌려주고 임차권등기를 말소했는지 확인하세요."
+   ],
+   "item": "lease"
+  },
+  {
+   "id": "ratio-red",
+   "title": "보증금 위험 비율",
+   "when": {
+    "ratioAtLeast": 0.8
+   },
+   "grade": "red",
+   "reason": "먼저 잡힌 빚(선순위 {debt})과 내 보증금({deposit})을 합치면 시세({price})의 {pct}%예요. 집이 경매로 넘어가면 내 보증금이 다 남지 않을 수 있어요.",
+   "actions": [
+    "보증금을 낮추거나, 전세보증금 반환보증에 가입할 수 있는 집인지 물어보세요."
+   ],
+   "item": "ratio"
+  },
+  {
+   "id": "ratio-yellow",
+   "title": "보증금 비율 조심",
+   "when": {
+    "ratioAtLeast": 0.7,
+    "ratioBelow": 0.8
+   },
+   "grade": "yellow",
+   "reason": "선순위 {debt} + 보증금 {deposit} = 시세({price})의 {pct}%예요. 위험선에 가까워요.",
+   "actions": [
+    "시세를 같은 건물 최근 거래로 다시 확인하고, 반환보증 가입이 되는지 물어보세요."
+   ],
+   "item": "ratio"
+  },
+  {
+   "id": "mortgage",
+   "title": "근저당",
+   "when": {
+    "has": [
+     "mortgage"
+    ]
+   },
+   "grade": "yellow",
+   "reason": "집주인이 이 집을 담보로 돈을 빌렸어요(채권최고액 합계 {mortgageSum}). 경매가 되면 이 돈이 내 보증금보다 먼저예요.",
+   "actions": [
+    "근저당의 실제 대출 잔액이 얼마인지 묻고, 잔금 날 갚고 말소한다는 조건을 계약서 특약에 넣을 수 있는지 물어보세요."
+   ],
+   "item": "mortgage"
+  },
+  {
+   "id": "jeonse",
+   "title": "앞선 전세권",
+   "when": {
+    "has": [
+     "jeonse"
+    ]
+   },
+   "grade": "yellow",
+   "reason": "먼저 등기된 전세권(전세금 {jeonseSum})이 있어요. 그 전세금이 내 보증금보다 먼저예요.",
+   "actions": [
+    "그 전세권이 아직 살아 있는지, 그 세입자가 언제 나가고 말소되는지 물어보세요."
+   ],
+   "item": "jeonse"
+  },
+  {
+   "id": "owner-mismatch",
+   "title": "소유자와 계약 상대",
+   "when": {
+    "ownerMismatch": true
+   },
+   "grade": "red",
+   "reason": "등기부의 소유자({owner})와 계약하려는 사람({counterparty})이 달라 보여요.",
+   "actions": [
+    "계약하는 사람이 소유자 본인인지 신분증으로 확인하고, 대리인이면 위임장과 인감증명서를 받으세요."
+   ],
+   "item": "owner"
+  },
+  {
+   "id": "always",
+   "title": "잔금 날 할 일",
+   "when": {
+    "always": true
+   },
+   "grade": "info",
+   "reason": "등기부등본은 계약 뒤에도 바뀔 수 있어요.",
+   "actions": [
+    "잔금 날 등기부등본을 다시 떼어 보고, 그날 바로 전입신고와 확정일자를 받으세요."
+   ],
+   "item": "always"
+  }
+ ],
+ "items": [
+  {
+   "id": "ratio",
+   "title": "보증금이 안전한 비율인가",
+   "pass": "선순위 {debt} + 보증금 {deposit} = 시세의 {pct}%예요. 흔히 쓰는 조심선(70%)보다 낮아요.",
+   "unknown": "시세를 적으면 선순위와 보증금을 합친 비율을 계산해요."
+  },
+  {
+   "id": "seizure",
+   "title": "압류·가압류",
+   "pass": "압류·가압류 기록이 없어요."
+  },
+  {
+   "id": "auction",
+   "title": "경매",
+   "pass": "경매가 시작된 기록이 없어요."
+  },
+  {
+   "id": "trust",
+   "title": "신탁",
+   "pass": "신탁으로 소유권이 넘어간 기록이 없어요."
+  },
+  {
+   "id": "owner",
+   "title": "소유자와 계약 상대",
+   "pass": "등기부의 소유자({owner})와 계약 상대({counterparty})가 같아 보여요.",
+   "unknown": "계약 상대 이름을 적으면 등기부 소유자와 맞는지 봐요."
+  },
+  {
+   "id": "mortgage",
+   "title": "근저당",
+   "pass": "근저당이 없어요."
+  },
+  {
+   "id": "jeonse",
+   "title": "앞선 전세권",
+   "pass": "먼저 등기된 전세권이 없어요."
+  },
+  {
+   "id": "lease",
+   "title": "이전 세입자의 임차권등기",
+   "pass": "보증금을 못 돌려받고 나간 기록이 없어요."
+  },
+  {
+   "id": "injunction",
+   "title": "가처분",
+   "pass": "가처분 기록이 없어요."
+  },
+  {
+   "id": "prereg",
+   "title": "가등기",
+   "pass": "가등기 기록이 없어요."
+  },
+  {
+   "id": "always",
+   "title": "잔금 날 할 일",
+   "pass": ""
+  }
+ ]
 }
