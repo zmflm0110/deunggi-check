@@ -2,6 +2,8 @@
 
 > 등기부등본의 근저당·가압류 항목을 체크리스트 규칙으로 점검해 계약 직전 위험 신호를 쉬운 말로 알려 주는 웹 도구.
 
+**바로 써 보기: <https://zmflm0110.github.io/deunggi-check/>** · 데모 장면: <https://zmflm0110.github.io/deunggi-check/app/?demo=villa>
+
 ![등기체크 — 빌라 샘플을 넣고 '확인'을 누른 화면](demo/demo.png)
 
 ## 문제
